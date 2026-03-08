@@ -213,7 +213,7 @@ export default function NotebookPage() {
   };
 
   return (
-    <div className="relative flex h-screen overflow-hidden bg-gray-800 text-white">
+    <div className="relative flex h-[100dvh] overflow-hidden bg-gray-800 text-white">
       {/* Mobile sidebar backdrop */}
       {isMobileView && sidebarOpen && (
         <button
@@ -356,7 +356,7 @@ export default function NotebookPage() {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 pb-24 md:p-4 md:pb-4 space-y-4">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-gray-500 px-4">
@@ -447,7 +447,7 @@ export default function NotebookPage() {
         </div>
 
         {/* Input Area */}
-        <div className="p-3 md:p-4 border-t border-gray-700 bg-gray-800">
+        <div className="sticky bottom-0 z-10 border-t border-gray-700 bg-gray-800 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:p-4 md:pb-4">
           <div className="flex gap-2 md:gap-3">
             <input
               type="text"
