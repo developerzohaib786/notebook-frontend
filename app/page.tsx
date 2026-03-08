@@ -415,7 +415,7 @@ export default function NotebookPage() {
                       {msg.context && msg.context.length > 0 && (
                         <div className="mt-4 pt-3 border-t border-gray-600">
                           <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-2">
-                            Context from Vector Database
+                            Retrieved data from Vector Database
                           </p>
                           <div className="space-y-2">
                             {msg.context.map((doc, i) => (
