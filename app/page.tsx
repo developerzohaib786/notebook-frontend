@@ -73,7 +73,9 @@ export default function NotebookPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
+  const previousIsMobileView = useRef<boolean | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const acceptedFileTypes = ".pdf";
@@ -85,6 +87,25 @@ export default function NotebookPage() {
       .then((data) => setDocuments(data.pdfs ?? []))
       .catch((err) => console.error("Failed to fetch PDFs:", err));
   }, [isLoaded, user]);
+
+  useEffect(() => {
+    const syncViewportState = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobileView(mobile);
+
+      if (previousIsMobileView.current === null) {
+        setSidebarOpen(!mobile);
+      } else if (previousIsMobileView.current && !mobile) {
+        setSidebarOpen(true);
+      }
+
+      previousIsMobileView.current = mobile;
+    };
+
+    syncViewportState();
+    window.addEventListener("resize", syncViewportState);
+    return () => window.removeEventListener("resize", syncViewportState);
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -191,12 +212,23 @@ export default function NotebookPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-800 text-white">
+    <div className="relative flex h-screen overflow-hidden bg-gray-800 text-white">
+      {isMobileView && sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar backdrop"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-20 bg-black/60 md:hidden"
+        />
+      )}
+
       {/* Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-80" : "w-0"
-        } transition-all duration-300 bg-gray-800 border-r border-gray-700 flex flex-col overflow-hidden`}
+          isMobileView
+            ? `fixed inset-y-0 left-0 z-30 w-80 max-w-[85vw] transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`
+            : `${sidebarOpen ? "w-80" : "w-0"} transition-all duration-300`
+        } bg-gray-800 border-r border-gray-700 flex flex-col overflow-hidden`}
       >
         <div className="p-4 border-b border-gray-700">
           <h2 className="text-xl font-bold mb-4">📚 Documents</h2>
@@ -276,13 +308,25 @@ export default function NotebookPage() {
       </div>
 
       {/* Toggle Sidebar Button */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-700 p-2 rounded-r-lg hover:bg-gray-600 transition-colors"
-        style={{ left: sidebarOpen ? "320px" : "0" }}
-      >
-        {sidebarOpen ? "◀" : "▶"}
-      </button>
+      {isMobileView ? (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          className="fixed left-3 top-3 z-40 bg-gray-700 p-2 rounded-lg hover:bg-gray-600 transition-colors md:hidden"
+        >
+          {sidebarOpen ? "✕" : "☰"}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-700 p-2 rounded-r-lg hover:bg-gray-600 transition-colors"
+          style={{ left: sidebarOpen ? "320px" : "0" }}
+        >
+          {sidebarOpen ? "◀" : "▶"}
+        </button>
+      )}
 
       {/* Chat Interface */}
       <div className="flex-1 flex flex-col">
