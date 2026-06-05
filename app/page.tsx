@@ -7,7 +7,7 @@ import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5003";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://radiant-river-47433-b51b00b90d42.herokuapp.com";
 
 interface Document {
   id: string;
